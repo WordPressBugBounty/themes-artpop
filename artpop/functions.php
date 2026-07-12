@@ -51,7 +51,19 @@ function artpop_setup() {
 	 * Switch default core markup for search form, comment form, and comments
 	 * to output valid HTML5.
 	 */
-	add_theme_support( 'html5', array( 'comment-form', 'comment-list', 'gallery', 'caption' ) );
+	add_theme_support(
+		'html5',
+		array(
+			'search-form',
+			'comment-form',
+			'comment-list',
+			'gallery',
+			'caption',
+			'script',
+			'style',
+			'navigation-widgets',
+		)
+	);
 
 	// Set up the WordPress Custom Logo Feature.
 	add_theme_support( 'custom-logo', array(
@@ -153,7 +165,6 @@ if ( ! function_exists( 'artpop_fonts_url' ) ) :
 function artpop_fonts_url() {
 	$fonts_url = '';
 	$fonts     = array();
-	$subsets   = 'latin,latin-ext';
 
 	if ( 'off' !== _x( 'on', 'Inter: on or off', 'artpop' ) ) {
 		$fonts[] = 'Inter:400,400i,700,700i';
@@ -163,23 +174,9 @@ function artpop_fonts_url() {
 		$fonts[] = 'Quicksand:400,700';
 	}
 
-	/* translators: To add an additional character subset specific to your language, translate this to 'greek', 'cyrillic', 'devanagari' or 'vietnamese'. Do not translate into your own language. */
-	$subset = _x( 'no-subset', 'Add new subset (greek, cyrillic, devanagari, vietnamese)', 'artpop' );
-
-	if ( 'cyrillic' == $subset ) {
-		$subsets .= ',cyrillic,cyrillic-ext';
-	} elseif ( 'greek' == $subset ) {
-		$subsets .= ',greek,greek-ext';
-	} elseif ( 'devanagari' == $subset ) {
-		$subsets .= ',devanagari';
-	} elseif ( 'vietnamese' == $subset ) {
-		$subsets .= ',vietnamese';
-	}
-
 	if ( $fonts ) {
 		$fonts_url = add_query_arg( array(
 			'family'  => urlencode( implode( '|', $fonts ) ),
-			'subset'  => urlencode( $subsets ),
 			'display' => 'swap',
 		), 'https://fonts.googleapis.com/css' );
 	}
@@ -560,7 +557,7 @@ function artpop_custom_logo() {
 	$show_tagline = get_theme_mod( 'site_logo_show_tagline', artpop_defaults( 'site_logo_show_tagline' ) );
 	if ( $show_tagline && ( $description || is_customize_preview() ) ) :
 		echo '<p class="site-description">';
-		echo $description;
+		echo esc_html( $description );
 		echo '</p>';
 	endif;
 }
@@ -636,28 +633,25 @@ function artpop_get_duplicate_post_ids() {
 		$featured_posts = get_posts( $args );
 
 		if ( $featured_posts ) {
-			foreach ( $featured_posts as $post ) :
-			$featured_post_array[] = $post->ID;
-			endforeach;
-			wp_reset_postdata();
+			foreach ( $featured_posts as $featured_post ) {
+				$featured_post_array[] = $featured_post->ID;
+			}
 		}
 	}
 	return $featured_post_array;
 }
 
-// Retrieve list of duplicate posts.
-$duplicate_posts = artpop_get_duplicate_post_ids();
-
-if ( ! empty( $duplicate_posts ) ) {
-
 function artpop_exclude_duplicate_posts( $query ) {
-	if ( $query->is_main_query() && $query->is_home() ) {
-		$query->set( 'post__not_in', artpop_get_duplicate_post_ids() );
+	if ( is_admin() || ! $query->is_main_query() || ! $query->is_home() ) {
+		return;
+	}
+
+	$duplicate_post_ids = artpop_get_duplicate_post_ids();
+	if ( ! empty( $duplicate_post_ids ) ) {
+		$query->set( 'post__not_in', $duplicate_post_ids );
 	}
 }
 add_action( 'pre_get_posts', 'artpop_exclude_duplicate_posts' );
-
-}
 
 /**
  * Retrieve list of categories.
@@ -713,7 +707,7 @@ function artpop_notice() {
 			<a class="button button-primary" href="<?php echo esc_url( 'https://www.designlabthemes.com/artpop-pro-wordpress-theme/?utm_source=WordPress&utm_medium=notice&utm_campaign=artpop_upsell' ); ?>" target="_blank">
 				<?php esc_html_e( 'View Artpop Pro', 'artpop' ); ?>
 			</a>
-			<a style="color: #646970;margin-left: 0.5em;" href="<?php echo esc_url( '?artpop-dismissed' ); ?>">
+			<a style="color: #646970;margin-left: 0.5em;" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'artpop-dismissed', '1' ), 'artpop_dismiss_notice' ) ); ?>">
 				<?php esc_html_e( 'Dismiss', 'artpop' ); ?>
 			</a>
 		</p>
@@ -724,9 +718,20 @@ function artpop_notice() {
 add_action( 'admin_notices', 'artpop_notice' );
 
 function artpop_notice_dismissed() {
-	$user_id = get_current_user_id();
-	if ( isset( $_GET['artpop-dismissed'] ) ) {
-		add_user_meta( $user_id, 'artpop_notice_dismissed', 'true', true );
+	if ( ! isset( $_GET['artpop-dismissed'] ) ) {
+		return;
 	}
+
+	if ( ! current_user_can( 'edit_theme_options' ) ) {
+		return;
+	}
+
+	check_admin_referer( 'artpop_dismiss_notice' );
+
+	$user_id = get_current_user_id();
+	add_user_meta( $user_id, 'artpop_notice_dismissed', 'true', true );
+
+	wp_safe_redirect( remove_query_arg( array( 'artpop-dismissed', '_wpnonce' ) ) );
+	exit;
 }
 add_action( 'admin_init', 'artpop_notice_dismissed' );

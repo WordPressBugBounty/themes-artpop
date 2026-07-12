@@ -2,9 +2,9 @@
 Contributors: Design Lab Themes
 Tags: blog, one-column, two-columns, right-sidebar, custom-background, custom-colors, custom-menu, custom-logo, editor-style, featured-images, footer-widgets, full-width-template, grid-layout, theme-options, translation-ready, block-styles, wide-blocks
 Requires at least: 5.0
-Tested up to: 6.8
-Requires PHP: 5.6
-Stable tag: 1.0.4
+Tested up to: 7.0
+Requires PHP: 7.4
+Stable tag: 1.1.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -12,6 +12,8 @@ Welcome to Artpop, a Gutenberg-first WordPress theme carefully designed to help 
 
 == Description ==
 Artpop is a beautiful Gutenberg-first WordPress theme, carefully designed to help you build your online brand. We built Artpop with performance, usability, and SEO in mind. It’s fast, lightweight, and fully AMP-compatible. Well documented and easy to use even for WordPress beginners, Artpop is perfect for a blog, personal portfolio, small business website, and WooCommerce storefront. Easily set your logo, change colors, and create awesome layouts to give your website a truly unique look.
+
+Requires PHP 7.4 or higher. PHP 8.2 or higher is recommended.
 
 == Frequently Asked Questions ==
 
@@ -29,6 +31,16 @@ https://www.designlabthemes.com/artpop-documentation/
 Please visit https://wordpress.org/support/theme/artpop/ if you have any questions about the theme.
 
 == Changelog ==
+
+= 1.1.4 =
+* WordPress 7.0 compatibility and maintenance update
+* Extend HTML5 theme support (search-form, script, style, navigation-widgets)
+* Harden admin notice dismiss with nonce and capability checks
+* Sanitize About page tab query arguments
+* Remove deprecated Google Fonts subset parameter
+* Run featured post exclusion only inside the pre_get_posts callback
+* Escape site tagline with esc_html() in custom logo output
+* Fix the Accent color in the block editor
 
 = 1.1.3 =
 * Update About Page to fix the incorrect call to the _load_textdomain_just_in_time function

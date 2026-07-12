@@ -91,29 +91,6 @@ function artpop_custom_style() {
 add_action( 'wp_enqueue_scripts', 'artpop_custom_style' );
 
 /**
-  * Set the custom CSS via Customizer options.
-  */
-function artpop_editor_css() {
-	$accent_color = esc_attr( get_theme_mod( 'accent_color' ) );
-
-	$editor_css = "";
-
-	// Accent Color
-	if ( ! empty( $accent_color ) ) {
-		$editor_css .= "
-		.editor-styles-wrapper :where(.wp-block a),
-		.editor-styles-wrapper :where(.wp-block a:hover),
-		.wp-block-freeform.block-library-rich-text__tinymce a
-		.wp-block-freeform.block-library-rich-text__tinymce a:hover,
-		.editor-styles-wrapper .wp-block-quote:before,
-		.editor-styles-wrapper .wp-block-latest-posts.is-grid li a:hover {
-			color: {$accent_color};
-		}";
-	}
-	return $editor_css;
-}
-
-/**
  * Enqueue Customizer settings into the block editor.
  */
 function artpop_editor_style() {
@@ -121,7 +98,5 @@ function artpop_editor_style() {
 	wp_enqueue_style( 'artpop-block-editor-style', get_theme_file_uri( '/inc/css/editor-blocks.css' ) );
 	// Add Google fonts.
 	wp_enqueue_style( 'artpop-block-editor-fonts', artpop_fonts_url(), array(), null );
-	// Add Customizer colors and fonts.
-	wp_add_inline_style( 'artpop-block-editor-style', artpop_editor_css() );
 }
 add_action( 'enqueue_block_editor_assets', 'artpop_editor_style' );

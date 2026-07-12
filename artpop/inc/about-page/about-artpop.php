@@ -61,7 +61,13 @@ function artpop_about_page() { ?>
 			</div>
 
 			<!-- Display tabs -->
-			<?php $active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'artpop_tab_1'; ?>
+			<?php
+			$valid_tabs = array( 'artpop_tab_1', 'artpop_tab_2' );
+			$active_tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'artpop_tab_1';
+			if ( ! in_array( $active_tab, $valid_tabs, true ) ) {
+				$active_tab = 'artpop_tab_1';
+			}
+			?>
 
 			<nav class="nav-tab-wrapper wp-clearfix">
 				<a href="?page=about_artpop&tab=artpop_tab_1" class="nav-tab <?php echo $active_tab == 'artpop_tab_1' ? 'nav-tab-active' : ''; ?>">

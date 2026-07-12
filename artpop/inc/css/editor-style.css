@@ -91,14 +91,6 @@ small {
 big {
 	font-size: 125%;
 }
-a {
-	color: #6fcacc;
-	text-decoration: none;
-}
-a:hover {
-	text-decoration: underline;
-	color: #6fcacc;
-}
 
 /* Elements */
 ul,
